@@ -1,0 +1,6 @@
+# One path substring per line. Matching images are excluded from manifest.
+ml_data/raw/料棚/钢渣/192.168.110.81_01_20260518210137266.jpg
+ml_data/raw/料棚/钢渣/192.168.110.81_01_20260519160738957.jpg
+ml_data/raw/料棚/钢渣/192.168.110.81_01_20260520104518906.jpg
+ml_data/raw/料棚/钢渣/192.168.110.81_01_20260518210131377.jpg
+ml_data/raw/料棚/钢渣/192.168.110.81_01_2026051909491997.jpg

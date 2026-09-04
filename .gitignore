@@ -1,0 +1,14 @@
+.venv/
+.venv312/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+output/*
+!output/.gitkeep
+data/incoming/*
+data/manifests/*
+data/raw/*
+!data/incoming/.gitkeep
+!data/manifests/.gitkeep
+!data/raw/.gitkeep
+runtime/torch_hub/*.lock

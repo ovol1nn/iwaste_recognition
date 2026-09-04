@@ -1,0 +1,27 @@
+{
+  "煤矸石": {
+    "particle_size": "unknown",
+    "shape": "unknown",
+    "color": "unknown"
+  },
+  "矿渣": {
+    "particle_size": "unknown",
+    "shape": "unknown",
+    "color": "unknown"
+  },
+  "钢渣": {
+    "particle_size": "unknown",
+    "shape": "unknown",
+    "color": "unknown"
+  },
+  "石膏": {
+    "particle_size": "unknown",
+    "shape": "unknown",
+    "color": "unknown"
+  },
+  "其他": {
+    "particle_size": "unknown",
+    "shape": "unknown",
+    "color": "unknown"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "material_type": [
+    {
+      "key": "coal_gangue",
+      "display_name": "煤矸石",
+      "directory_name": "煤矸石",
+      "known_class": true
+    },
+    {
+      "key": "slag",
+      "display_name": "矿渣",
+      "directory_name": "矿渣",
+      "known_class": true
+    },
+    {
+      "key": "steel_slag",
+      "display_name": "钢渣",
+      "directory_name": "钢渣",
+      "known_class": true
+    },
+    {
+      "key": "gypsum",
+      "display_name": "石膏",
+      "directory_name": "石膏",
+      "known_class": true
+    }
+  ],
+  "particle_size": [
+    "unknown"
+  ],
+  "shape": [
+    "unknown"
+  ],
+  "color": [
+    "unknown"
+  ]
+}

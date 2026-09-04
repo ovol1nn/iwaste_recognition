@@ -1,0 +1,28 @@
+{
+  "augment": {
+    "known_target_train_count": 120,
+    "reject_target_train_count": 48,
+    "known_max_augs_per_image": 4,
+    "reject_max_augs_per_image": 4,
+    "clean_old_augs": true
+  },
+  "train": {
+    "epochs": 30,
+    "batch_size": 8,
+    "learning_rate": 0.0005,
+    "device": "cpu",
+    "reject_loss_weight": 0.5,
+    "sampler": "balanced",
+    "freeze_backbone_epochs": 4,
+    "early_stop_patience": 8,
+    "seed": 42,
+    "reject_threshold": 0.8,
+    "label_smoothing": 0.05,
+    "num_workers": 0
+  },
+  "predict": {
+    "recursive": false,
+    "threshold_override": null,
+    "similarity_threshold_override": null
+  }
+}
