@@ -1,0 +1,135 @@
+{
+  "model_version": "solid_waste_resnet18_v1",
+  "exported_at": "2026-06-26T09:41:23.855595+00:00",
+  "model_family": "resnet18_multitask_with_similarity_rejection",
+  "probability_threshold": 0.55,
+  "similarity_threshold": 0.8438892960548401,
+  "threshold": 0.55,
+  "input_size": [
+    224,
+    224
+  ],
+  "input_layout": "NCHW",
+  "input_color_space": "RGB",
+  "normalization": {
+    "mean": [
+      0.485,
+      0.456,
+      0.406
+    ],
+    "std": [
+      0.229,
+      0.224,
+      0.225
+    ]
+  },
+  "labels": {
+    "material_type": [
+      "煤矸石",
+      "矿渣",
+      "钢渣",
+      "石膏"
+    ],
+    "particle_size": [
+      "unknown"
+    ],
+    "shape": [
+      "unknown"
+    ],
+    "color": [
+      "unknown"
+    ]
+  },
+  "training_data": {
+    "dataset_root": "D:/code/pythonprojects/IWaste/ml_data/raw",
+    "known_classes": [
+      "煤矸石",
+      "石膏",
+      "矿渣",
+      "钢渣"
+    ],
+    "hard_negatives": [],
+    "note": "当前训练使用实验室与料棚两类采集场景；其他类别由概率和原型相似度阈值拒识得到。",
+    "manifest_path": "ml_data/manifests/manifest.csv",
+    "train_log_tail": [
+      {
+        "epoch": 13,
+        "train_loss": 1.0391516116532413,
+        "known_accuracy": 0.5677966101694916,
+        "reject_rate": 0.0,
+        "effective_batches": 110,
+        "known_batches": 110,
+        "reject_only_batches": 0,
+        "scene_metrics": {
+          "known_accuracy_scene_实验室": 0.6190476190476191,
+          "known_accuracy_scene_料棚": 0.5394736842105263
+        }
+      },
+      {
+        "epoch": 14,
+        "train_loss": 0.9790377085859125,
+        "known_accuracy": 0.6271186440677966,
+        "reject_rate": 0.0,
+        "effective_batches": 110,
+        "known_batches": 110,
+        "reject_only_batches": 0,
+        "scene_metrics": {
+          "known_accuracy_scene_实验室": 0.6666666666666666,
+          "known_accuracy_scene_料棚": 0.6052631578947368
+        }
+      },
+      {
+        "epoch": 15,
+        "train_loss": 0.9738048076629638,
+        "known_accuracy": 0.6949152542372882,
+        "reject_rate": 0.0,
+        "effective_batches": 110,
+        "known_batches": 110,
+        "reject_only_batches": 0,
+        "scene_metrics": {
+          "known_accuracy_scene_实验室": 0.9047619047619048,
+          "known_accuracy_scene_料棚": 0.5789473684210527
+        }
+      },
+      {
+        "epoch": 16,
+        "train_loss": 0.9280339723283594,
+        "known_accuracy": 0.652542372881356,
+        "reject_rate": 0.0,
+        "effective_batches": 110,
+        "known_batches": 110,
+        "reject_only_batches": 0,
+        "scene_metrics": {
+          "known_accuracy_scene_实验室": 0.7619047619047619,
+          "known_accuracy_scene_料棚": 0.5921052631578947
+        }
+      },
+      {
+        "epoch": 17,
+        "train_loss": 0.9099489255384965,
+        "known_accuracy": 0.423728813559322,
+        "reject_rate": 0.0,
+        "effective_batches": 110,
+        "known_batches": 110,
+        "reject_only_batches": 0,
+        "scene_metrics": {
+          "known_accuracy_scene_实验室": 0.4523809523809524,
+          "known_accuracy_scene_料棚": 0.40789473684210525
+        }
+      }
+    ]
+  },
+  "training_config": {
+    "epochs": 30,
+    "batch_size": 8,
+    "learning_rate": 0.0005,
+    "reject_loss_weight": 0.5,
+    "sampler": "balanced",
+    "freeze_backbone_epochs": 4,
+    "early_stop_patience": 8,
+    "seed": 42,
+    "label_smoothing": 0.05,
+    "num_workers": 0,
+    "pretrained": false
+  }
+}

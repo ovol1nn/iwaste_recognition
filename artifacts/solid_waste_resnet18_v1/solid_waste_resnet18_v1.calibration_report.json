@@ -1,0 +1,12 @@
+{
+  "probability_threshold": 0.55,
+  "similarity_threshold": 0.8438892960548401,
+  "metrics": {
+    "known_accept_rate": 0.0,
+    "reject_rate": 0.0,
+    "score": 0.0
+  },
+  "prototype_path": "solid_waste_model/artifacts/history/solid_waste_resnet18_v1/solid_waste_resnet18_v1.prototype_features.npz",
+  "known_val_count": 118,
+  "reject_val_count": 0
+}
