@@ -20,9 +20,9 @@
   "prototypes_per_class_max": 3,
   "prototype_count": 12,
   "rejection_thresholds": {
-    "confidence": 0.6474252820014954,
-    "similarity": 0.8054810762405396,
-    "margin": 0.38043490052223206
+    "confidence": 0.55,
+    "similarity": 0.70,
+    "margin": 0.10
   },
   "threshold_note": "Thresholds are calibrated only on correctly classified known validation images. No unknown-material validation data is available.",
   "metrics": {
