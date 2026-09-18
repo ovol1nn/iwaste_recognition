@@ -1,0 +1,82 @@
+{
+  "model_version": "solid_waste_dinov2_proto_round2_baseline_k3",
+  "created_at": "2026-09-16T16:34:23.516702+00:00",
+  "model_type": "dinov2_vits14_frozen_feature_multi_prototype",
+  "class_labels": [
+    "煤矸石",
+    "矿渣",
+    "钢渣"
+  ],
+  "dino_loader": "torchhub",
+  "dino_model": "dinov2_vits14",
+  "image_size": 448,
+  "class_temperature": 0.07,
+  "vote_temperature": 0.03,
+  "manifest": "D:/code/pythonprojects/IWaste/IWaste_rec_model/data/manifests/round2_baseline_manifest.csv",
+  "crop_names": [
+    "full",
+    "center",
+    "top_left",
+    "top_right",
+    "bottom_left",
+    "bottom_right"
+  ],
+  "crop_ratio": 0.78,
+  "prototypes_per_class_max": 3,
+  "prototype_count": 9,
+  "rejection_thresholds": {
+    "confidence": 0.6515859603881836,
+    "similarity": 0.77556614279747,
+    "margin": 0.376870533823967
+  },
+  "threshold_note": "Thresholds are calibrated only on correctly classified known validation images. No unknown-material validation data is available.",
+  "metrics": {
+    "train": {
+      "count": 1133,
+      "raw_accuracy": 0.9452780229479258,
+      "by_scene": {
+        "料棚_第一阶段": {
+          "count": 454,
+          "raw_accuracy": 0.9096916299559471
+        },
+        "料棚_第二阶段": {
+          "count": 679,
+          "raw_accuracy": 0.9690721649484536
+        }
+      },
+      "rejection_rate": 0.3000882612533098,
+      "accepted_correct_rate": 0.6954986760812003
+    },
+    "validation": {
+      "count": 135,
+      "raw_accuracy": 0.9481481481481482,
+      "by_scene": {
+        "料棚_第二阶段": {
+          "count": 135,
+          "raw_accuracy": 0.9481481481481482
+        }
+      },
+      "rejection_rate": 0.2222222222222222,
+      "accepted_correct_rate": 0.7703703703703704
+    },
+    "test": {
+      "count": 96,
+      "raw_accuracy": 0.9375,
+      "by_scene": {
+        "料棚_第二阶段": {
+          "count": 96,
+          "raw_accuracy": 0.9375
+        }
+      },
+      "rejection_rate": 0.5729166666666666,
+      "accepted_correct_rate": 0.4270833333333333
+    }
+  },
+  "artifacts": {
+    "prototype": "D:/code/pythonprojects/IWaste/IWaste_rec_model/artifacts/solid_waste_dinov2_proto_round2_baseline_k3/solid_waste_dinov2_proto_round2_baseline_k3.prototypes.npz",
+    "meta": "D:/code/pythonprojects/IWaste/IWaste_rec_model/artifacts/solid_waste_dinov2_proto_round2_baseline_k3/solid_waste_dinov2_proto_round2_baseline_k3.meta.json",
+    "report": "D:/code/pythonprojects/IWaste/IWaste_rec_model/artifacts/solid_waste_dinov2_proto_round2_baseline_k3/solid_waste_dinov2_proto_round2_baseline_k3.report.json",
+    "val_errors": "D:/code/pythonprojects/IWaste/IWaste_rec_model/artifacts/solid_waste_dinov2_proto_round2_baseline_k3/solid_waste_dinov2_proto_round2_baseline_k3.validation_errors.csv",
+    "test_errors": "D:/code/pythonprojects/IWaste/IWaste_rec_model/artifacts/solid_waste_dinov2_proto_round2_baseline_k3/solid_waste_dinov2_proto_round2_baseline_k3.test_errors.csv"
+  }
+}

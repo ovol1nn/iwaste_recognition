@@ -12,3 +12,4 @@ data/raw/*
 !data/manifests/.gitkeep
 !data/raw/.gitkeep
 runtime/torch_hub/*.lock
+node_modules

@@ -57,13 +57,19 @@ def resolve_device(requested_device: str) -> torch.device:
     return torch.device(requested_device)
 
 
-def normalize_rows(manifest_path: Path, usage_roles: set[str], include_augmented: bool) -> list[dict[str, str]]:
+def normalize_rows(
+    manifest_path: Path,
+    usage_roles: set[str],
+    include_augmented: bool,
+    class_labels: Sequence[str],
+) -> list[dict[str, str]]:
     with manifest_path.open("r", encoding="utf-8", newline="") as handle:
         rows = [
             row
             for row in csv.DictReader(handle)
             if row["usage_role"] in usage_roles
             and row["is_known_class"] == "True"
+            and row["material_type"] in class_labels
             and (include_augmented or row.get("augmentation_source") == "original")
         ]
     if not rows:
@@ -275,6 +281,7 @@ def build_prototype_bank(
     encoded_rows: dict[str, dict[str, object]],
     prototypes_per_class: int,
     kmeans_iterations: int,
+    class_labels: Sequence[str] = MATERIAL_TYPE_LABELS,
 ) -> PrototypeBank:
     by_label: dict[str, list[np.ndarray]] = defaultdict(list)
     for record in encoded_rows.values():
@@ -285,7 +292,7 @@ def build_prototype_bank(
 
     labels: list[str] = []
     prototypes: list[np.ndarray] = []
-    for label in MATERIAL_TYPE_LABELS:
+    for label in class_labels:
         vectors = by_label.get(label, [])
         if not vectors:
             continue
@@ -307,10 +314,10 @@ def softmax(values: np.ndarray, temperature: float) -> np.ndarray:
 
 def class_similarities(vector: np.ndarray, bank: PrototypeBank) -> dict[str, float]:
     similarities = l2_normalize(vector.reshape(1, -1))[0] @ bank.prototypes.T
+    class_labels = list(dict.fromkeys(bank.labels))
     return {
         label: float(max(similarities[index] for index, prototype_label in enumerate(bank.labels) if prototype_label == label))
-        for label in MATERIAL_TYPE_LABELS
-        if label in bank.labels
+        for label in class_labels
     }
 
 
@@ -320,20 +327,21 @@ def classify_features(
     class_temperature: float,
     vote_temperature: float,
 ) -> dict[str, object]:
+    class_labels = list(dict.fromkeys(bank.labels))
     crop_results: list[dict[str, object]] = []
     crop_max_scores: list[float] = []
     for crop_name, vector in features.items():
         scores = class_similarities(vector, bank)
-        score_vector = np.array([scores[label] for label in MATERIAL_TYPE_LABELS], dtype=np.float32)
+        score_vector = np.array([scores[label] for label in class_labels], dtype=np.float32)
         probabilities = softmax(score_vector, class_temperature)
         top_index = int(np.argmax(score_vector))
         crop_results.append(
             {
                 "crop": crop_name,
                 "scores": scores,
-                "top_label": MATERIAL_TYPE_LABELS[top_index],
+                "top_label": class_labels[top_index],
                 "top_similarity": float(score_vector[top_index]),
-                "probabilities": {label: float(probabilities[index]) for index, label in enumerate(MATERIAL_TYPE_LABELS)},
+                "probabilities": {label: float(probabilities[index]) for index, label in enumerate(class_labels)},
             }
         )
         crop_max_scores.append(float(score_vector[top_index]))
@@ -341,15 +349,15 @@ def classify_features(
     if not crop_results:
         raise ValueError("cannot classify an image without crop features")
     weights = softmax(np.array(crop_max_scores, dtype=np.float32), vote_temperature)
-    probabilities = np.zeros(len(MATERIAL_TYPE_LABELS), dtype=np.float32)
+    probabilities = np.zeros(len(class_labels), dtype=np.float32)
     winner_similarities = np.zeros(len(crop_results), dtype=np.float32)
     for index, crop_result in enumerate(crop_results):
         crop_probabilities = crop_result["probabilities"]
-        probabilities += weights[index] * np.array([crop_probabilities[label] for label in MATERIAL_TYPE_LABELS])  # type: ignore[index]
+        probabilities += weights[index] * np.array([crop_probabilities[label] for label in class_labels])  # type: ignore[index]
 
     order = np.argsort(probabilities)[::-1]
     winner_index = int(order[0])
-    winner_label = MATERIAL_TYPE_LABELS[winner_index]
+    winner_label = class_labels[winner_index]
     for index, crop_result in enumerate(crop_results):
         winner_similarities[index] = crop_result["scores"][winner_label]  # type: ignore[index]
 
@@ -358,7 +366,7 @@ def classify_features(
         "confidence": float(probabilities[winner_index]),
         "margin": float(probabilities[winner_index] - probabilities[int(order[1])]) if len(order) > 1 else 1.0,
         "similarity": float(np.dot(weights, winner_similarities)),
-        "class_probabilities": {label: float(probabilities[index]) for index, label in enumerate(MATERIAL_TYPE_LABELS)},
+        "class_probabilities": {label: float(probabilities[index]) for index, label in enumerate(class_labels)},
         "crop_results": crop_results,
         "crop_weights": {crop_results[index]["crop"]: float(weights[index]) for index in range(len(crop_results))},
     }
@@ -508,10 +516,14 @@ def train(args: argparse.Namespace) -> None:
         raise ValueError("crop_ratio must be in (0, 1]")
     if args.batch_size < 1 or args.prototypes_per_class < 1:
         raise ValueError("batch_size and prototypes_per_class must be positive")
+    class_labels = tuple(label.strip() for label in args.labels.split(",") if label.strip())
+    unknown_labels = set(class_labels) - set(MATERIAL_TYPE_LABELS)
+    if len(class_labels) < 2 or unknown_labels:
+        raise ValueError(f"labels must contain at least two known classes; invalid={sorted(unknown_labels)}")
 
-    train_rows = normalize_rows(args.manifest, {"known_train"}, args.include_augmented_train)
-    validation_rows = normalize_rows(args.manifest, {"known_val"}, False)
-    test_rows = normalize_rows(args.manifest, {"known_test"}, False)
+    train_rows = normalize_rows(args.manifest, {"known_train"}, args.include_augmented_train, class_labels)
+    validation_rows = normalize_rows(args.manifest, {"known_val"}, False, class_labels)
+    test_rows = normalize_rows(args.manifest, {"known_test"}, False, class_labels)
     print(
         f"[dataset] train={len(train_rows)} val={len(validation_rows)} test={len(test_rows)} "
         f"include_augmented_train={args.include_augmented_train}",
@@ -527,7 +539,7 @@ def train(args: argparse.Namespace) -> None:
         local_repository=args.local_repository,
     )
     train_encoded = encode_rows(encoder, train_rows, crop_names, args.crop_ratio, args.batch_size, "train")
-    bank = build_prototype_bank(train_encoded, args.prototypes_per_class, args.kmeans_iterations)
+    bank = build_prototype_bank(train_encoded, args.prototypes_per_class, args.kmeans_iterations, class_labels)
     validation_encoded = encode_rows(encoder, validation_rows, crop_names, args.crop_ratio, args.batch_size, "validation")
     test_encoded = encode_rows(encoder, test_rows, crop_names, args.crop_ratio, args.batch_size, "test")
 
@@ -543,6 +555,7 @@ def train(args: argparse.Namespace) -> None:
         "model_version": args.model_version,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "model_type": "dinov2_vits14_frozen_feature_multi_prototype",
+        "class_labels": list(class_labels),
         "dino_loader": encoder.loader,
         "dino_model": encoder.model_id,
         "image_size": args.image_size,
@@ -655,6 +668,7 @@ def parse_args() -> argparse.Namespace:
     train_parser.add_argument("--crop-ratio", type=float, default=0.78)
     train_parser.add_argument("--rejection-quantile", type=float, default=0.10)
     train_parser.add_argument("--include-augmented-train", action="store_true")
+    train_parser.add_argument("--labels", default=",".join(MATERIAL_TYPE_LABELS), help="Comma-separated active class labels for this model version.")
     add_shared_model_arguments(train_parser)
 
     predict_parser = subparsers.add_parser("predict", help="predict one image or a folder with saved prototypes")

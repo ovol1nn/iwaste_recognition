@@ -45,6 +45,21 @@ def test_multi_crop_classifier_prefers_nearest_label_and_rejects_low_margin() ->
     assert not apply_rejection(result, {"confidence": 0.5, "similarity": 0.6, "margin": 0.2})
 
 
+def test_multi_crop_classifier_supports_a_subset_of_known_classes() -> None:
+    bank = PrototypeBank(
+        labels=["煤矸石", "矿渣", "钢渣"],
+        prototypes=np.eye(3, dtype=np.float32),
+    )
+    result = classify_features(
+        {"center": np.array([0.0, 0.1, 0.9], dtype=np.float32)},
+        bank,
+        class_temperature=0.07,
+        vote_temperature=0.03,
+    )
+    assert result["predicted_label"] == "钢渣"
+    assert set(result["class_probabilities"]) == {"煤矸石", "矿渣", "钢渣"}
+
+
 def test_build_prototype_bank_keeps_class_prototypes() -> None:
     first, second = MATERIAL_TYPE_LABELS[:2]
     encoded = {
